@@ -466,4 +466,24 @@ class Article < Content
     to = to - 1 # pull off 1 second so we don't overlap onto the next day
     return from..to
   end
+
+  def merge_with(other_article_id)
+    self.class.connection.uncached do
+      merged_article = self.class.find_by_id(other_article_id)
+      if merged_article
+        ActiveRecord::Base.transaction do
+          self.update_attributes(:body => self.body + "\n" + merged_article.body)
+          merged_article.comments.each do |comment|
+            self.comments << comment
+          end
+          logger.debug self
+          self.save!
+          merged_article = self.class.find_by_id(other_article_id)
+          merged_article.destroy
+        end
+        return merged_article.title
+      end
+    end
+    return nil
+  end
 end

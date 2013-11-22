@@ -52,6 +52,27 @@ class Admin::ContentController < Admin::BaseController
     redirect_to :action => 'index'
   end
 
+  def merge
+    unless current_user.admin?
+      flash[:error] = _("Error, you are not allowed to perform this action")
+      redirect_to :action => 'index' and return
+    end
+    @article = Article.find_by_id(params[':id'])
+    if @article
+      @merged_article_title = @article.merge_with(params[:merge_with])
+      if @merged_article_title
+        flash[:notice] = _("#{@article.title} was successfully merged with #{@merged_article_title}")
+        redirect_to admin_content_path
+      else
+        flash[:error] = _("Error, article was not found")
+        redirect_to :action => 'edit', :controller => 'admin/content', :id => @article.id 
+      end
+    else
+      flash[:error] = _("Error, you are not allowed to perform this action")
+      redirect_to :action => 'index' and return
+    end
+  end
+
   def insert_editor
     editor = 'visual'
     editor = 'simple' if params[:editor].to_s == 'simple'
@@ -240,4 +261,5 @@ class Admin::ContentController < Admin::BaseController
   def setup_resources
     @resources = Resource.by_created_at
   end
+
 end
