@@ -59,6 +59,11 @@ class Admin::ContentController < Admin::BaseController
     end
     @article = Article.find_by_id(params[':id'])
     if @article
+      if params[':id'] == params[:merge_with]
+        flash[:error] = _("Error, tried to merge article with itself")
+        redirect_to :action => 'edit', :controller => 'admin/content', :id => @article.id
+        return
+      end
       @merged_article_title = @article.merge_with(params[:merge_with])
       if @merged_article_title
         flash[:notice] = _("#{@article.title} was successfully merged with #{@merged_article_title}")
