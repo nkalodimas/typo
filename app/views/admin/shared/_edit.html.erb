@@ -4,7 +4,6 @@
   <%= render :partial => "form" %>
 
 <% end %>
-<%= simple_format @article.to_yaml %>
 <% unless @article.new_record? or !current_user.admin? %>
   <%= form_tag('/admin/content/merge') do %>
     <%= hidden_field_tag(':id', @article.id.to_s) %>

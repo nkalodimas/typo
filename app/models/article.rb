@@ -476,7 +476,6 @@ class Article < Content
           merged_article.comments.each do |comment|
             self.comments << comment
           end
-          logger.debug self
           self.save!
           merged_article = self.class.find_by_id(other_article_id)
           merged_article.destroy
